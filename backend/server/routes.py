@@ -5,7 +5,6 @@ import io
 
 from . import services
 from .config import MAX_TOP_N
-from .utils import image_utils
 
 router = APIRouter()
 
@@ -23,20 +22,21 @@ async def search_image(
     file: UploadFile = File(...),
     top_n: int = Query(5, ge=1, le=MAX_TOP_N),
 ):
-    """Search for similar memes to the uploaded image."""
+    """Search for similar memes to the uploaded image using FAISS hybrid embedding backend."""
     print(
         f"[routes] Received search request filename={getattr(file,'filename',None)} top_n={top_n}"
     )
 
-    # Check service status
-    status = services.get_service_status()
-    if not status["initialized"]:
-        raise HTTPException(status_code=500, detail="Service not initialized")
+    # Check if FAISS is initialized
+    if not services.faiss_index_initialized():
+        raise HTTPException(status_code=500, detail="FAISS index not initialized")
 
     try:
         # Read uploaded image directly into memory
         contents = await file.read()
         image = Image.open(io.BytesIO(contents)).convert("RGB")
+
+        # now find similar images
         similar_images = services.find_similar_images(image, top_n)
 
         if not similar_images:
