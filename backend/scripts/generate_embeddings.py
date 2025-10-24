@@ -210,13 +210,6 @@ for idx, filename in enumerate(image_files, 1):
         hybrid_vec = hybrid_vec / np.linalg.norm(hybrid_vec)
 
         # --- Store ---
-        embeddings[filename] = {
-            "clip": clip_vec.tolist(),
-            "object": object_vec.tolist(),
-            "emotion": emo_vec.tolist(),
-            "pose": pose_vec.tolist(),
-            "hand": hand_vec.tolist(),
-        }
         filenames.append(filename)
         vectors.append(hybrid_vec)
 
@@ -227,8 +220,6 @@ for idx, filename in enumerate(image_files, 1):
         traceback.print_exc()
 
 # --- Save embeddings.json (optional, for debugging) ---
-with open(os.path.join(OUT_DIR, "embeddings.json"), "w") as f:
-    json.dump(embeddings, f)
 
 # --- Save metadata ---
 with open(os.path.join(OUT_DIR, "metadata.json"), "w") as f:
