@@ -26,3 +26,18 @@ A fun project that matches your face and pose to popular memes using AI. Quickly
    ```bash
    uvicorn app:app --reload --host 127.0.0.1 --port 8000
    ```
+
+## To run the frontend
+1. Change to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Install dependencies if you haven't already:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+The frontend will be accessible at `http://localhost:5173` by default.
