@@ -1,1 +1,7 @@
 .DS_Store
+
+.vscode/
+
+#  add the venv directory to .gitignore
+venv/
+backend/.venv/
