@@ -1,0 +1,19 @@
+# backend/requirements.txt
+
+# FastAPI backend
+fastapi==0.109.0
+uvicorn==0.23.1
+
+# CLIP / PyTorch
+torch==2.3.1
+torchvision==0.18.1
+ftfy==6.1.1          # CLIP dependency
+regex==2025.10.23    # CLIP dependency
+tqdm==4.66.0         # Optional for progress bars
+git+https://github.com/openai/CLIP.git@main#egg=clip  # OpenAI's CLIP model
+
+# Image handling
+Pillow==10.1.0
+
+# Transformers (optional if you extend)
+# transformers==4.40.0
