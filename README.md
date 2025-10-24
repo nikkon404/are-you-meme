@@ -3,18 +3,30 @@
 A fun project that matches your face and pose to popular memes using AI. Quickly find the meme that best represents your expression and share it with friends.
 
 
-## To run the embedding generation script
-1. Navigate to the backend directory:
+1. **Navigate to the backend directory**
    ```bash
    cd backend
    ```
-2. Ensure the `models` directory exists and contains the `clip_encoder.py` file.
-3. Run the embedding generation script with the appropriate Python path:
-    ```bash
-      PYTHONPATH=$PYTHONPATH:. .venv/bin/python3 -m scripts.generate_embeddings  
-    ```
 
-  
+2. **Create a virtual environment** (if it doesn’t already exist)
+   ```bash
+   python -m venv .venv
+   ```
+
+3. **Activate the virtual environment**
+   ```bash
+   source .venv/bin/activate
+   ```
+
+4. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+5. **Run the embedding generation script**
+   ```bash
+   python scripts/generate_embeddings.py
+   ```
 
 ## To start the server
 1. Change to the backend directory and activate the virtual environment:

@@ -18,6 +18,9 @@ Pillow==10.1.0
 
 # Machine learning / utilities
 scikit-learn
-
-# Transformers (optional if you extend)
-# transformers==4.40.0
+faiss-cpu==1.7.4
+mediapipe==0.10.14
+deepface==0.0.93
+numpy==1.26.4
+tensorflow==2.18.0
+protobuf>=4.25.3,<5
