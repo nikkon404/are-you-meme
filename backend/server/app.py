@@ -21,13 +21,17 @@ def create_app() -> FastAPI:
 
     app.include_router(router)
 
-    # Ensure uploads directory exists and serve it as static files at /uploads
-    uploads_dir = os.path.join(
-        os.path.dirname(os.path.dirname(__file__)), "resources", "uploads"
-    )
-    uploads_dir = os.path.abspath(uploads_dir)
-    os.makedirs(uploads_dir, exist_ok=True)
-    app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+    # Mount directories for meme images
+    backend_dir = os.path.dirname(os.path.dirname(__file__))
+    resources_dir = os.path.join(backend_dir, "resources")
+
+    # Mount memes directory
+    memes_dir = os.path.join(resources_dir, "memes")
+    memes_dir = os.path.abspath(memes_dir)
+    if not os.path.exists(memes_dir):
+        print(f"[server.app] Warning: Memes directory does not exist: {memes_dir}")
+    else:
+        app.mount("/memes", StaticFiles(directory=memes_dir), name="memes")
 
     @app.on_event("startup")
     def startup():
