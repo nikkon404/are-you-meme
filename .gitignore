@@ -5,3 +5,6 @@
 #  add the venv directory to .gitignore
 venv/
 backend/.venv/
+
+
+frontend/node_modules/

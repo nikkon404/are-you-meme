@@ -19,4 +19,13 @@ A fun project that matches your face and pose to popular memes using AI. Quickly
     ```
   
 
-
+## To start the server
+1. Change to the backend directory and activate the virtual environment:
+   ```bash
+   cd backend
+   source .venv/bin/activate
+   ```
+2. Run the FastAPI app with Uvicorn:
+   ```bash
+   uvicorn app:app --reload --host 127.0.0.1 --port 8000
+   ```
