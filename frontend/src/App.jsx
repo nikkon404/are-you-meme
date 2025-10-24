@@ -1,12 +1,24 @@
-import React, { useState } from "react";
-import CameraCapture from "./CameraCapture";
+import React, { useState, useEffect } from "react";
+import WelcomeScreen from "./components/WelcomeScreen";
+import CaptureScreen from "./components/CaptureScreen";
+import PreviewScreen from "./components/PreviewScreen";
 
 export default function App() {
+    const [screen, setScreen] = useState("welcome"); // "welcome" | "capture" | "preview"
+    const [fadeIn, setFadeIn] = useState(false);
+
     const [uploadedUrl, setUploadedUrl] = useState(null);
     const [bestMatchUrl, setBestMatchUrl] = useState(null);
     const [randomMatchUrl, setRandomMatchUrl] = useState(null);
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        // Trigger fade-in effect when screen changes
+        setFadeIn(false);
+        const timeout = setTimeout(() => setFadeIn(true), 10);
+        return () => clearTimeout(timeout);
+    }, [screen]);
 
     async function handleCapture(blob) {
         // create local preview URL (frontend keeps the snapshot)
@@ -41,48 +53,47 @@ export default function App() {
             } else {
                 setRandomMatchUrl(null);
             }
+
+            // Move to preview screen after successful capture and fetch
+            setScreen("preview");
         } catch (err) {
             alert("Upload failed: " + err);
         }
         setLoading(false);
     }
 
+    function handleGetStarted() {
+        setScreen("capture");
+    }
+
+    function handleTryAgain() {
+        // Reset state and go back to capture screen
+        setUploadedUrl(null);
+        setBestMatchUrl(null);
+        setRandomMatchUrl(null);
+        setResults([]);
+        setScreen("capture");
+    }
+
+    // Render the appropriate screen based on current state
     return (
-        <div className="container">
-            <h1>Are You Meme — Camera Search</h1>
-            <CameraCapture onCapture={handleCapture} />
-
-            {loading && (
-                <div className="loading-overlay">
-                    <div className="spinner" />
-                    <p>Uploading and searching...</p>
-                </div>
+        <div className={`app-container${fadeIn ? " fade-in" : ""}`}>
+            {screen === "welcome" && (
+                <WelcomeScreen onGetStarted={handleGetStarted} />
             )}
 
-            {uploadedUrl && bestMatchUrl && (
-                <div className="comparison-result">
-                    <div className="comparison-item">
-                        <h3>Your Image</h3>
-                        <img src={uploadedUrl} alt="uploaded" className="preview" />
-                    </div>
-                    <div className="comparison-item">
-                        <h3>Best Match</h3>
-                        <img src={bestMatchUrl} alt="best match" className="preview" />
-                        <p className="match-score">Score: {results[0]?.score.toFixed(4)}</p>
-                    </div>
-                </div>
+            {screen === "capture" && (
+                <CaptureScreen onCapture={handleCapture} loading={loading} />
             )}
 
-            {randomMatchUrl && (
-                <div className="result">
-                    <h3>Random Match</h3>
-                    <div className="single-match">
-                        <div className="match-item single">
-                            <img src={randomMatchUrl} alt="random match" className="match-image" />
-                        </div>
-                        <p className="match-score">(one randomly selected from results)</p>
-                    </div>
-                </div>
+            {screen === "preview" && (
+                <PreviewScreen
+                    uploadedUrl={uploadedUrl}
+                    bestMatchUrl={bestMatchUrl}
+                    randomMatchUrl={randomMatchUrl}
+                    results={results}
+                    onTryAgain={handleTryAgain}
+                />
             )}
         </div>
     );

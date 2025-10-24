@@ -4,6 +4,7 @@ export default function CameraCapture({ onCapture }) {
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const [streaming, setStreaming] = useState(false);
+    const [countdown, setCountdown] = useState(0);
 
     useEffect(() => {
         async function start() {
@@ -26,7 +27,7 @@ export default function CameraCapture({ onCapture }) {
         };
     }, []);
 
-    function capture() {
+    function doCapture() {
         const video = videoRef.current;
         const canvas = canvasRef.current;
         if (!video || !canvas) return;
@@ -39,13 +40,35 @@ export default function CameraCapture({ onCapture }) {
         }, "image/jpeg", 0.95);
     }
 
+    function startCountdownAndCapture() {
+        if (!streaming || countdown > 0) return;
+        let seconds = 1;
+        setCountdown(seconds);
+        const interval = setInterval(() => {
+            seconds -= 1;
+            setCountdown(seconds);
+            if (seconds <= 0) {
+                clearInterval(interval);
+                setCountdown(0);
+                doCapture();
+            }
+        }, 1000);
+    }
+
     return (
         <div className="camera">
-            <video ref={videoRef} className="video" playsInline muted />
+            <div className="camera-stage">
+                <video ref={videoRef} className="video" playsInline muted />
+                {countdown > 0 && (
+                    <div className="countdown-overlay">
+                        <div className="countdown-number">{countdown}</div>
+                    </div>
+                )}
+            </div>
             <canvas ref={canvasRef} style={{ display: "none" }} />
             <div className="controls">
-                <button onClick={capture} disabled={!streaming}>
-                    Capture & Search
+                <button className="btn btn-primary" onClick={startCountdownAndCapture} disabled={!streaming || countdown > 0}>
+                    {countdown > 0 ? `Capturing in ${countdown}...` : "Capture & Search"}
                 </button>
             </div>
         </div>
