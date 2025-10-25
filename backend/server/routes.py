@@ -3,9 +3,10 @@ from fastapi import APIRouter, File, UploadFile, HTTPException, Query, Request
 import os
 from PIL import Image
 import io
+import base64
 
 from . import services
-from .config import MAX_TOP_N
+from .config import MAX_TOP_N, BASE_DIR
 
 # Strict upload size limit (5 MB)
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
@@ -57,7 +58,7 @@ async def search_image(
         if not similar_images:
             raise HTTPException(status_code=404, detail="No similar images found")
 
-        # Build image URLs using PUBLIC_BASE_URL when provided (prod), otherwise relative (dev/tunnel)
+        # Build image URLs - frontend will fetch with auth
         public_base = (os.getenv("PUBLIC_BASE_URL") or "").rstrip("/")
 
         def build_url(filename: str) -> str:
@@ -71,14 +72,14 @@ async def search_image(
             {
                 "image_url": build_url(img["filename"]),
                 "score": img["score"],
+                "filename": img["filename"],
             }
             for img in similar_images
         ]
 
-        print(f"[routes] Returning results")
+        print(f"[routes] Returning {len(results)} results")
         return {
-            "best_match": results[0]["image_url"],
-            "all_results": results,
+            "results": results,
         }
 
     except HTTPException:
