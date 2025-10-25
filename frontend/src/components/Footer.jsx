@@ -4,7 +4,7 @@ import { LinkedIn, GitHub, Instagram, LocalCafe } from "@mui/icons-material";
 
 export default function Footer() {
     return (
-        <Box component="footer" sx={{ height: 72, py: 2, bgcolor: "transparent", position: "sticky", bottom: 18 }}>
+        <Box component="footer" sx={{ height: 72, py: 2, mt: 1, bgcolor: "transparent", position: "sticky", bottom: 12 }}>
             <Container maxWidth="md">
                 <Stack spacing={1} alignItems="center" textAlign="center">
                     <Typography variant="body2" color="text.secondary">

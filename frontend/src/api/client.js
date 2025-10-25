@@ -1,11 +1,14 @@
 // Vite exposes env vars only when prefixed with VITE_
-function resolveApiBase() {
+function getApiBaseFromEnv() {
     const envBase = import.meta.env?.VITE_API_BASE;
-    const base = envBase || (typeof window !== "undefined" ? window.location.origin : "");
-    return (base || "").replace(/\/$/, "");
+    if (!envBase) {
+        throw new Error("VITE_API_BASE is not set. Create frontend/.env and set VITE_API_BASE.");
+    }
+    return envBase.replace(/\/$/, "");
 }
 
-const API_BASE = resolveApiBase();
+const API_BASE = getApiBaseFromEnv();
+console.log("API_BASE", API_BASE);
 
 export async function searchImage(blob, topN = 5) {
     const form = new FormData();

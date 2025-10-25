@@ -60,6 +60,7 @@ export default function App() {
                                 uploadedUrl={uploadedUrl}
                                 bestMatchUrl={bestMatchUrl}
                                 results={results}
+                                onDownload={undefined}
                                 onRetry={handleTryAgain}
                             />
                         </motion.div>
@@ -77,6 +78,7 @@ export default function App() {
                     </DialogActions>
                 </Dialog>
             </div>
+
             <Footer />
         </ThemeProvider>
     );
