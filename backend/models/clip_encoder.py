@@ -1,10 +1,19 @@
+import os
 import torch
 import clip
 
 
 def load_clip_model(device):
-    """Load the CLIP model and return model and preprocess function"""
-    model, preprocess = clip.load("ViT-B/32", device=device)
+    """Load the CLIP model and return model and preprocess function.
+
+    Force downloads/caches into a writable directory inside the container
+    to avoid permission errors on environments where HOME points to '/'.
+    """
+    download_root = os.environ.get("CLIP_CACHE_DIR", "/tmp/clip")
+    os.makedirs(download_root, exist_ok=True)
+    model, preprocess = clip.load(
+        "ViT-B/32", device=device, download_root=download_root
+    )
     return model, preprocess
 
 
