@@ -10,9 +10,11 @@ export default function CameraCapture({ onCapture }) {
         async function start() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                videoRef.current.srcObject = stream;
-                await videoRef.current.play();
-                setStreaming(true);
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    await videoRef.current.play();
+                    setStreaming(true);
+                }
             } catch (err) {
                 console.error("Failed to access camera", err);
                 alert("Failed to access camera: " + err.message);
@@ -42,7 +44,7 @@ export default function CameraCapture({ onCapture }) {
 
     function startCountdownAndCapture() {
         if (!streaming || countdown > 0) return;
-        let seconds = 1;
+        let seconds = 1; // user preference (was 3 originally)
         setCountdown(seconds);
         const interval = setInterval(() => {
             seconds -= 1;
@@ -61,16 +63,24 @@ export default function CameraCapture({ onCapture }) {
                 <video ref={videoRef} className="video" playsInline muted />
                 {countdown > 0 && (
                     <div className="countdown-overlay">
-                        <div className="countdown-number">{countdown}</div>
+                        <div className="countdown-text">Hold still</div>
                     </div>
                 )}
             </div>
             <canvas ref={canvasRef} style={{ display: "none" }} />
             <div className="controls">
                 <button className="btn btn-primary" onClick={startCountdownAndCapture} disabled={!streaming || countdown > 0}>
+                    <span className="btn-icon" aria-hidden>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 3l1.5 2h3L15 3h3a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h3z" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                            <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.5" />
+                        </svg>
+                    </span>
                     {countdown > 0 ? `Capturing in ${countdown}...` : "Capture & Search"}
                 </button>
             </div>
         </div>
     );
 }
+
+// re-export removed; this file now contains the full component implementation
