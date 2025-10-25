@@ -7,6 +7,9 @@ import io
 from . import services
 from .config import MAX_TOP_N
 
+# Strict upload size limit (5 MB)
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+
 router = APIRouter()
 
 
@@ -35,6 +38,12 @@ async def search_image(
     try:
         # Read uploaded image directly into memory
         contents = await file.read()
+
+        # Enforce strict 5 MB limit (no compression)
+        if len(contents) > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="File too large. Max 5 MB.")
+
+        # Decode to PIL Image for model
         image = Image.open(io.BytesIO(contents)).convert("RGB")
 
         # now find similar images

@@ -9,6 +9,7 @@ export default function CameraCapture({ onCapture }) {
     const [facingMode, setFacingMode] = useState("user"); // 'user' | 'environment'
     const fileInputRef = useRef(null);
     const [mirrored, setMirrored] = useState(true);
+    const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
 
     function isLocalhost() {
         if (typeof window === "undefined") return false;
@@ -84,7 +85,12 @@ export default function CameraCapture({ onCapture }) {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         canvas.toBlob((blob) => {
-            if (blob && onCapture) onCapture(blob);
+            if (!blob) return;
+            if (blob.size > MAX_UPLOAD_BYTES) {
+                setErrorMessage("File too large. Max 5 MB.");
+                return;
+            }
+            if (onCapture) onCapture(blob);
         }, "image/jpeg", 0.95);
     }
 
@@ -114,6 +120,11 @@ export default function CameraCapture({ onCapture }) {
     function onFilePicked(e) {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
+        if (file.size > MAX_UPLOAD_BYTES) {
+            setErrorMessage("File too large. Max 5 MB.");
+            e.target.value = "";
+            return;
+        }
         // Call onCapture with the picked image file (blob)
         if (onCapture) onCapture(file);
         // reset input value so the same file can be picked again
