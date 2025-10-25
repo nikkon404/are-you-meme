@@ -8,6 +8,7 @@ export default function CameraCapture({ onCapture }) {
     const [errorMessage, setErrorMessage] = useState(null);
     const [facingMode, setFacingMode] = useState("user"); // 'user' | 'environment'
     const fileInputRef = useRef(null);
+    const [mirrored, setMirrored] = useState(true);
 
     function isLocalhost() {
         if (typeof window === "undefined") return false;
@@ -69,6 +70,11 @@ export default function CameraCapture({ onCapture }) {
         };
     }, [facingMode]);
 
+    // Default mirror when using front camera; unmirror for back camera
+    useEffect(() => {
+        setMirrored(facingMode === "user");
+    }, [facingMode]);
+
     function doCapture() {
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -117,7 +123,13 @@ export default function CameraCapture({ onCapture }) {
     return (
         <div className="camera">
             <div className="camera-stage">
-                <video ref={videoRef} className="video" playsInline muted />
+                <video
+                    ref={videoRef}
+                    className="video"
+                    playsInline
+                    muted
+                    style={{ transform: mirrored ? "scaleX(-1)" : "none", transformOrigin: "center" }}
+                />
                 {/* Flip camera overlay button */}
                 <button
                     type="button"
@@ -147,6 +159,35 @@ export default function CameraCapture({ onCapture }) {
                         <path d="M17 17H7a4 4 0 01-4-4v-2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
                         <path d="M9 5l-2 2 2 2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
                         <path d="M15 15l2 2-2 2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                </button>
+                {/* Mirror toggle overlay button */}
+                <button
+                    type="button"
+                    aria-label="Mirror preview"
+                    onClick={() => setMirrored((m) => !m)}
+                    style={{
+                        position: "absolute",
+                        bottom: 10,
+                        left: 10,
+                        width: 40,
+                        height: 40,
+                        borderRadius: 9999,
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "rgba(0,0,0,0.45)",
+                        color: "#fff",
+                        cursor: "pointer",
+                        backdropFilter: "blur(2px)",
+                    }}
+                >
+                    {/* mirror icon */}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4v16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                        <path d="M11 6H6a3 3 0 00-3 3v6a3 3 0 003 3h5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                        <path d="M13 6h5a3 3 0 013 3v6a3 3 0 01-3 3h-5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
                     </svg>
                 </button>
                 {countdown > 0 && (
