@@ -46,7 +46,7 @@ class CLIPService:
     def encode_image_augmented(self, image: Image.Image) -> np.ndarray:
         """Encode with simple test-time augmentation and return a normalized vector.
 
-        We average embeddings from the original and a horizontal flip to reduce
+        Averages embeddings from the original and a horizontal flip to reduce
         sensitivity to pose/mirror variations, then re-normalize.
         """
         variants = [image]

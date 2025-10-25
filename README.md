@@ -2,6 +2,20 @@
 
 A fun project that matches your face and pose to popular memes using AI. Quickly find the meme that best represents your expression and share it with friends.
 
+<img src="img/screen_shot.png" alt="Are You Meme preview" width="430" />
+
+## How it works (quick)
+- Snap or upload a photo.
+- Compute a compact visual fingerprint using multiple signals:
+  - 🏃 Pose (40%): your body posture and position
+  - ✋ Hand gestures (25%): thumbs up, peace sign, facepalm, etc.
+  - 🖼️ Scene & vibe (20%): background/composition (faces mostly masked)
+  - 🙂 Emotion (10%): facial expression
+  - 📦 Objects (5%): props and items in frame
+- Searches a FAISS index of meme embeddings and return the closest matches.
+- Privacy: your photo is processed for matching and not stored.
+
+
 
 1. **Navigate to the backend directory**
    ```bash
