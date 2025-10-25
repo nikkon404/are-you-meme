@@ -7,7 +7,7 @@ python-multipart    # For FastAPI file uploads
 
 # CLIP / PyTorch (Render-compatible CPU wheels)
 torch==2.5.1
-torchvision==0.20.1
+torchvision==0.22.1
 ftfy==6.1.1          # CLIP dependency
 regex==2025.10.23    # CLIP dependency
 tqdm==4.66.0         # Optional for progress bars
