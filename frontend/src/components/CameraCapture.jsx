@@ -6,6 +6,8 @@ export default function CameraCapture({ onCapture }) {
     const [streaming, setStreaming] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [errorMessage, setErrorMessage] = useState(null);
+    const [facingMode, setFacingMode] = useState("user"); // 'user' | 'environment'
+    const fileInputRef = useRef(null);
 
     function isLocalhost() {
         if (typeof window === "undefined") return false;
@@ -40,11 +42,15 @@ export default function CameraCapture({ onCapture }) {
                     );
                     return;
                 }
-                const constraints = { video: { facingMode: "user" } };
+                // stop previous stream if any
+                if (videoRef.current && videoRef.current.srcObject) {
+                    const prevTracks = videoRef.current.srcObject.getTracks();
+                    prevTracks.forEach((t) => t.stop());
+                }
+                const constraints = { video: { facingMode } };
                 const stream = await getUserMedia(constraints);
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
-                    // ensure iOS inline playback
                     videoRef.current.setAttribute("playsinline", "true");
                     await videoRef.current.play();
                     setStreaming(true);
@@ -61,7 +67,7 @@ export default function CameraCapture({ onCapture }) {
                 tracks.forEach((t) => t.stop());
             }
         };
-    }, []);
+    }, [facingMode]);
 
     function doCapture() {
         const video = videoRef.current;
@@ -91,10 +97,58 @@ export default function CameraCapture({ onCapture }) {
         }, 1000);
     }
 
+    function flipCamera() {
+        setFacingMode((m) => (m === "user" ? "environment" : "user"));
+    }
+
+    function openGalleryPicker() {
+        if (fileInputRef.current) fileInputRef.current.click();
+    }
+
+    function onFilePicked(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        // Call onCapture with the picked image file (blob)
+        if (onCapture) onCapture(file);
+        // reset input value so the same file can be picked again
+        e.target.value = "";
+    }
+
     return (
         <div className="camera">
             <div className="camera-stage">
                 <video ref={videoRef} className="video" playsInline muted />
+                {/* Flip camera overlay button */}
+                <button
+                    type="button"
+                    aria-label="Flip camera"
+                    onClick={flipCamera}
+                    disabled={!streaming || countdown > 0}
+                    style={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                        width: 40,
+                        height: 40,
+                        borderRadius: 9999,
+                        border: "none",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "rgba(0,0,0,0.45)",
+                        color: "#fff",
+                        cursor: "pointer",
+                        backdropFilter: "blur(2px)",
+                    }}
+                >
+                    {/* flip icon */}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 7h10a4 4 0 014 4v2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                        <path d="M17 17H7a4 4 0 01-4-4v-2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                        <path d="M9 5l-2 2 2 2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M15 15l2 2-2 2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                </button>
                 {countdown > 0 && (
                     <div className="countdown-overlay">
                         <div className="countdown-text">Hold still</div>
@@ -112,6 +166,16 @@ export default function CameraCapture({ onCapture }) {
                     </span>
                     {countdown > 0 ? `Capturing in ${countdown}...` : "Capture & Search"}
                 </button>
+                <button className="btn" onClick={openGalleryPicker} style={{ marginLeft: 8 }}>
+                    Choose from Gallery
+                </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={onFilePicked}
+                />
             </div>
             {errorMessage && (
                 <div className="camera-error" role="alert" style={{ marginTop: 12, color: "#b00020" }}>
