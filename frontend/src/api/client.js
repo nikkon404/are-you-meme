@@ -1,4 +1,11 @@
-const API_BASE = "http://127.0.0.1:8000";
+// Vite exposes env vars only when prefixed with VITE_
+function resolveApiBase() {
+    const envBase = import.meta.env?.VITE_API_BASE;
+    const base = envBase || (typeof window !== "undefined" ? window.location.origin : "");
+    return (base || "").replace(/\/$/, "");
+}
+
+const API_BASE = resolveApiBase();
 
 export async function searchImage(blob, topN = 5) {
     const form = new FormData();

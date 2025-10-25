@@ -5,19 +5,53 @@ export default function CameraCapture({ onCapture }) {
     const canvasRef = useRef(null);
     const [streaming, setStreaming] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    function isLocalhost() {
+        if (typeof window === "undefined") return false;
+        return /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname);
+    }
+
+    function isSecure() {
+        if (typeof window === "undefined") return true;
+        return window.isSecureContext || isLocalhost();
+    }
+
+    function getUserMedia(constraints) {
+        const mediaDevices = navigator && navigator.mediaDevices;
+        if (mediaDevices && typeof mediaDevices.getUserMedia === "function") {
+            return mediaDevices.getUserMedia(constraints);
+        }
+        const legacy =
+            (navigator && (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia)) ||
+            null;
+        if (legacy) {
+            return new Promise((resolve, reject) => legacy.call(navigator, constraints, resolve, reject));
+        }
+        return Promise.reject(new Error("Camera API not available on this browser"));
+    }
 
     useEffect(() => {
         async function start() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                if (!isSecure()) {
+                    setErrorMessage(
+                        "Camera access requires a secure context. Use HTTPS or run on localhost."
+                    );
+                    return;
+                }
+                const constraints = { video: { facingMode: "user" } };
+                const stream = await getUserMedia(constraints);
                 if (videoRef.current) {
                     videoRef.current.srcObject = stream;
+                    // ensure iOS inline playback
+                    videoRef.current.setAttribute("playsinline", "true");
                     await videoRef.current.play();
                     setStreaming(true);
                 }
             } catch (err) {
                 console.error("Failed to access camera", err);
-                alert("Failed to access camera: " + err.message);
+                setErrorMessage("Failed to access camera: " + (err && err.message ? err.message : String(err)));
             }
         }
         start();
@@ -79,6 +113,11 @@ export default function CameraCapture({ onCapture }) {
                     {countdown > 0 ? `Capturing in ${countdown}...` : "Capture & Search"}
                 </button>
             </div>
+            {errorMessage && (
+                <div className="camera-error" role="alert" style={{ marginTop: 12, color: "#b00020" }}>
+                    {errorMessage}
+                </div>
+            )}
         </div>
     );
 }
