@@ -145,6 +145,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* center capture button */
 }
 
 .preview {
