@@ -1,5 +1,6 @@
 # backend/server/routes.py
 from fastapi import APIRouter, File, UploadFile, HTTPException, Query, Request
+import os
 from PIL import Image
 import io
 
@@ -42,11 +43,19 @@ async def search_image(
         if not similar_images:
             raise HTTPException(status_code=404, detail="No similar images found")
 
-        # Build URLs for response
-        base = str(request.base_url).rstrip("/")
+        # Build image URLs using PUBLIC_BASE_URL when provided (prod), otherwise relative (dev/tunnel)
+        public_base = (os.getenv("PUBLIC_BASE_URL") or "").rstrip("/")
+
+        def build_url(filename: str) -> str:
+            return (
+                f"{public_base}/memes/{filename}"
+                if public_base
+                else f"/memes/{filename}"
+            )
+
         results = [
             {
-                "image_url": f"{base}/memes/{img['filename']}",
+                "image_url": build_url(img["filename"]),
                 "score": img["score"],
             }
             for img in similar_images
