@@ -13,6 +13,11 @@ MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 router = APIRouter()
 
 
+@router.get("/")
+def root():
+    return {"status": "ok", "message": "Are You Meme backend"}
+
+
 @router.get("/health")
 def health():
     """Get service health status."""
