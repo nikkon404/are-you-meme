@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { searchImage } from "../api/client";
+import { searchImage, fetchImageWithAuth } from "../api/client";
 
 export default function useImageSearch() {
     const [state, setState] = useState({
@@ -15,10 +15,22 @@ export default function useImageSearch() {
         setState((s) => ({ ...s, uploadedUrl: localUrl, loading: true, error: null }));
         try {
             const data = await searchImage(blob, 5);
+
+            // Fetch all images with auth and convert to blob URLs
+            const resultsWithBlobUrls = await Promise.all(
+                (data.results || []).map(async (result) => ({
+                    ...result,
+                    image_url: await fetchImageWithAuth(result.image_url),
+                }))
+            );
+
+            // Best match is the first result (highest score)
+            const bestMatchBlobUrl = resultsWithBlobUrls.length > 0 ? resultsWithBlobUrls[0].image_url : null;
+
             setState((s) => ({
                 ...s,
-                bestMatchUrl: data.best_match,
-                results: data.all_results || [],
+                bestMatchUrl: bestMatchBlobUrl,
+                results: resultsWithBlobUrls,
                 loading: false,
             }));
         } catch (e) {

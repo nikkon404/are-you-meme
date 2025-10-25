@@ -42,4 +42,19 @@ export async function health() {
     return resp.json();
 }
 
+export async function fetchImageWithAuth(imageUrl) {
+    const headers = {};
+    if (HF_TOKEN) {
+        headers["Authorization"] = `Bearer ${HF_TOKEN}`;
+    }
+
+    const resp = await fetch(imageUrl, { headers });
+    if (!resp.ok) {
+        throw new Error(`Failed to fetch image: ${resp.statusText}`);
+    }
+
+    const blob = await resp.blob();
+    return URL.createObjectURL(blob);
+}
+
 
