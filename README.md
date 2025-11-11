@@ -4,12 +4,7 @@ A fun project that matches your face and pose to popular memes using AI. Quickly
 
 ## Demo
 <p align="center">
-  <img src="demo/screen_shot.png" alt="Are You Meme preview"
-       height="400" style="display:inline-block; vertical-align:top;"/>
-  <video height="400" controls
-         style="display:inline-block; vertical-align:top;">
-    <source src="demo/demo.mp4" type="video/mp4">
-  </video>
+  <img src="demo/demo.gif" alt="Demo preview" height="400"/>
 </p>
 
 
